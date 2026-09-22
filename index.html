@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robot Framework & XPath Workshop</title>
+  <style>
+    :root {
+      --post-yellow: #ffcc00;
+      --post-black: #111111;
+      --post-red: #e30613;
+      --post-gray: #f5f5f5;
+      --post-border: #dddddd;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--post-black);
+      background: #ffffff;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      border-bottom: 1px solid var(--post-border);
+      background: #fff;
+      padding: 10px 24px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand img {
+      width: 84px;
+      height: 58px;
+      object-fit: cover;
+      border: 1px solid #d6ab00;
+    }
+    .brand-title {
+      font-weight: 700;
+      font-size: 1.4rem;
+    }
+    .accent-line { height: 4px; background: var(--post-yellow); }
+    main {
+      max-width: 980px;
+      margin: 24px auto;
+      padding: 0 20px 32px;
+    }
+    h1 { margin-top: 8px; }
+    .notice {
+      background: #ffb000;
+      color: #1d1d1d;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 16px 0 22px;
+      font-weight: 600;
+    }
+    form {
+      border: 1px solid var(--post-border);
+      border-radius: 8px;
+      padding: 20px;
+      background: var(--post-gray);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .field label { font-weight: 600; }
+    input, select, textarea {
+      border: 1px solid #b8b8b8;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 0.95rem;
+      background: #fff;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 10px 0;
+      flex-wrap: wrap;
+    }
+    .chip {
+      border: 1px solid #bdbdbd;
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: #fff;
+    }
+    .same-class-item { padding: 8px 10px; border-left: 4px solid var(--post-yellow); background: #fff; margin-bottom: 8px; }
+    .same-class-item.partial-a { border-left-color: #ffcc00; }
+    .same-class-item.partial-b { border-left-color: #e30613; }
+    .hobby-section {
+      margin-top: 12px;
+      padding: 14px;
+      border: 1px dashed #999;
+      background: #fff;
+    }
+    .actions { margin-top: 16px; display: flex; gap: 10px; }
+    .sub-section {
+      margin-top: 14px;
+      padding: 14px;
+      background: #ffffff;
+      border: 1px solid #cfcfcf;
+      border-radius: 6px;
+    }
+    .nested-box {
+      border: 1px solid #c9c9c9;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+    .btn {
+      border: none;
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #submitBtn { background: var(--post-yellow); color: #111; }
+    #cancelBtn { background: #222; color: #fff; }
+    #resultMessage { margin-top: 14px; font-weight: 700; color: var(--post-red); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.jpg" alt="Swiss Post logo" id="swisspostLogo">
+      <div class="brand-title" data-testid="brand-title">Workshop Playground</div>
+    </div>
+  </header>
+  <div class="accent-line"></div>
+
+  <main>
+    <h1 id="pageTitle">Robot Framework + XPath Practice Form</h1>
+    <p class="notice" id="infoBanner">Use this page to practice selectors by id, name, class, text, and contains().</p>
+
+    <form id="workshopForm" name="workshopFormName">
+      <div class="grid">
+        <div class="field">
+          <label for="firstName">First name</label>
+          <input id="firstName" name="user_first_name" class="input basic-input" type="text" placeholder="Type your name">
+        </div>
+        <div class="field">
+          <label for="emailAddress">Email</label>
+          <input id="emailAddress" name="user_email" class="input basic-input" type="email" placeholder="name@company.com">
+        </div>
+        <div class="field">
+          <label for="countrySelect">Country</label>
+          <select id="countrySelect" name="country">
+            <option value="">-- Select a country --</option>
+            <option value="ch">Switzerland</option>
+            <option value="pt">Portugal</option>
+            <option value="de">Germany</option>
+            <option value="es">Spain</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="experienceYears">Years of experience</label>
+          <input id="experienceYears" name="xp_years" type="number" min="0" max="40" value="1">
+        </div>
+        <div class="field">
+          <label for="employeeId">Employee ID</label>
+          <input id="employeeId" name="employee_id" class="input hr-field" type="text" placeholder="e.g. CH-000123">
+        </div>
+        <div class="field">
+          <label for="phoneNumber">Phone number</label>
+          <input id="phoneNumber" name="phone_number" class="input contact-field" type="tel" placeholder="+41 79 000 00 00">
+        </div>
+        <div class="field">
+          <label for="birthDate">Birth date</label>
+          <input id="birthDate" name="birth_date" class="input personal-field" type="date">
+        </div>
+        <div class="field">
+          <label for="preferredContact">Preferred contact</label>
+          <select id="preferredContact" name="preferred_contact" class="select contact-select">
+            <option value="">Choose one</option>
+            <option value="email">Email</option>
+            <option value="phone">Phone</option>
+            <option value="teams">Teams</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="bioText">Short bio</label>
+        <textarea id="bioText" name="bio" class="text-area training-area" rows="3" placeholder="Write something..."></textarea>
+      </div>
+      <div class="field">
+        <label for="motivationText">Motivation for this workshop</label>
+        <textarea id="motivationText" name="motivation" class="text-area long-area" rows="4" placeholder="Describe why you joined this workshop"></textarea>
+      </div>
+
+      <div class="row">
+        <span id="labelTrainingLevel">Training level:</span>
+        <label class="chip" for="lvlBasic"><input id="lvlBasic" type="radio" name="trainingLevel" value="basic" checked> Basic</label>
+        <label class="chip" for="lvlAdvanced"><input id="lvlAdvanced" type="radio" name="trainingLevel" value="advanced"> Advanced</label>
+      </div>
+
+      <section id="addressSection" class="sub-section profile-area address-wrapper">
+        <h3>Address information</h3>
+        <div class="grid">
+          <div class="field">
+            <label>Street</label>
+            <input name="street_name" type="text" class="address-input street-field">
+          </div>
+          <div class="field">
+            <label>Street number</label>
+            <input name="street_number" type="text" class="address-input number-field">
+          </div>
+          <div class="field">
+            <label>ZIP code</label>
+            <input name="zip_code" type="text" class="address-input zip-field">
+          </div>
+          <div class="field">
+            <label>City</label>
+            <input name="city_name" type="text" class="address-input city-field">
+          </div>
+        </div>
+      </section>
+
+      <section id="workSection" class="sub-section profile-area work-wrapper">
+        <h3>Work profile</h3>
+        <div class="grid">
+          <div class="field">
+            <label>Department</label>
+            <select  name="department" class="work-select">
+              <option value="">Select</option>
+              <option value="operations">Operations</option>
+              <option value="it">IT</option>
+              <option value="hr">HR</option>
+              <option value="finance">Finance</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Preferred shift</label>
+            <select name="work_shift" class="work-select">
+              <option value="">Select</option>
+              <option value="morning">Morning</option>
+              <option value="afternoon">Afternoon</option>
+              <option value="night">Night</option>
+            </select>
+          </div>
+          <div class="field">
+          <div class="field">
+            <label>Manager name</label>
+            <input name="manager_name" type="text" class="work-input manager-field">
+          </div>
+          <div class="field">
+            <label>Office location</label>
+            <input name="office_location" type="text" class="work-input location-field">
+          </div>
+        </div>
+      </section>
+
+      <section id="skillsSection" class="sub-section profile-area skills-wrapper">
+        <h3>Skills and tools</h3>
+        <div class="grid">
+          <div class="field">
+            <label for="mainBrowser">Main browser</label>
+            <select id="mainBrowser" name="main_browser" class="tool-select">
+              <option value="">Select browser</option>
+              <option value="chrome">Chrome</option>
+              <option value="edge">Edge</option>
+              <option value="firefox">Firefox</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="osChoice">Operating system</label>
+            <select id="osChoice" name="os_choice" class="tool-select">
+              <option value="">Select OS</option>
+              <option value="windows">Windows</option>
+              <option value="macos">macOS</option>
+              <option value="linux">Linux</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="robotLevel">Robot Framework experience</label>
+            <select id="robotLevel" name="robot_level" class="tool-select">
+              <option value="">Choose level</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="xpathLevel">XPath experience</label>
+            <select id="xpathLevel" name="xpath_level" class="tool-select">
+              <option value="">Choose level</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+
+
+      <div class="row">
+        <label for="hasHobbies">
+          <input type="checkbox" id="hasHobbies" name="has_hobbies">
+          I have hobbies
+        </label>
+        <label for="newsletterOptIn">
+          <input type="checkbox" id="newsletterOptIn" name="newsletter" checked>
+          Subscribe to newsletter
+        </label>
+      </div>
+
+      <section id="advancedSection" class="sub-section advanced-area">
+        <h3>Advanced training section (nested XPath practice)</h3>
+        <div class="nested-box level-one">
+          <div class="nested-box level-two">
+            <div class="nested-box level-three">
+              <div class="field nested-field">
+                <label>Advanced nested field A</label>
+                <input class="advanced-input" type="text" placeholder="Nested value">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="nested-box level-one alt">
+          <div class="nested-box level-two alt">
+            <div class="field nested-field">
+              <label>Advanced nested field B</label>
+              <input class="advanced-input" type="text" placeholder="Nested value">
+            </div>
+          </div>
+        </div>
+        <div class="nested-box level-one alt-2">
+          <div class="nested-box level-two alt-2">
+            <div class="nested-box level-three alt-2">
+              <div class="nested-box level-four alt-2">
+                <div class="field nested-field">
+                  <label>Advanced nested field</label>
+                  <input class="advanced-input" type="text">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field nested-field">
+          <label for="advancedSlider">Advanced slider practice</label>
+          <input id="advancedSlider" name="advanced_slider" type="range" min="1" max="10" value="7">
+        </div>
+
+        <div class="sub-section dialog-area">
+          <h3>Browser dialog practice</h3>
+          <p>Click to trigger a browser popup dialog.</p>
+          <button type="button" id="dialogTriggerBtn" class="btn action-btn dialog-button">Open browser dialog</button>
+        </div>
+      </section>
+
+      <section id="hobbySection" class="dynamic-section hobbies-wrapper hobby-section">
+        <h3>Hobbies details</h3>
+        <div id="hobbyRowsContainer">
+          <div class="hobby-row" data-row-index="1">
+            <div class="field">
+              <label for="hobbyType_1">Hobby 1</label>
+              <select id="hobbyType_1" name="hobby_type_1" class="hobby-select">
+                <option value="">Choose one</option>
+                <option value="sports">Sports</option>
+                <option value="music">Music</option>
+                <option value="coding">Coding</option>
+                <option value="travel">Travel</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="hobbyFrequency_1">Practice frequency 1</label>
+              <input id="hobbyFrequency_1" name="hobby_frequency_1" class="hobby-input field-hobby-frequency" type="text" placeholder="e.g. 2 times/week">
+            </div>
+          </div>
+        </div>
+        <button type="button" id="addHobbyBtn" class="btn">Add another hobby</button>
+      </section>
+
+      <div class="actions">
+        <button type="button" id="submitBtn" class="btn action-btn action-submit">Submit form</button>
+        <button type="reset" id="cancelBtn" class="btn action-btn action-cancel">Reset</button>
+      </div>
+
+      <p id="resultMessage" class="feedback-text">Waiting for action...</p>
+    </form>
+  </main>
+
+  <script>
+    const hasHobbies = document.getElementById('hasHobbies');
+    let hobbySection = null;
+    let advancedSection = null;
+    const hobbyRowsContainer = document.getElementById('hobbyRowsContainer');
+    const addHobbyBtn = document.getElementById('addHobbyBtn');
+    const basicRadio = document.getElementById('lvlBasic');
+    const advancedRadio = document.getElementById('lvlAdvanced');
+    const dialogTriggerBtn = document.getElementById('dialogTriggerBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const resultMessage = document.getElementById('resultMessage');
+    let hobbyIndex = 1;
+
+    function ensureHobbySection() {
+      if (!hobbySection) {
+        hobbySection = document.getElementById('hobbySection');
+      }
+      return hobbySection;
+    }
+
+    function addHobbyRow() {
+      hobbyIndex += 1;
+      const row = document.createElement('div');
+      row.className = 'hobby-row';
+      row.setAttribute('data-row-index', String(hobbyIndex));
+      row.innerHTML =
+        '<div class="field">' +
+        '<label for="hobbyType_' + hobbyIndex + '">Hobby ' + hobbyIndex + '</label>' +
+        '<select id="hobbyType_' + hobbyIndex + '" name="hobby_type_' + hobbyIndex + '" class="hobby-select">' +
+        '<option value="">Choose one</option>' +
+        '<option value="sports">Sports</option>' +
+        '<option value="music">Music</option>' +
+        '<option value="coding">Coding</option>' +
+        '<option value="travel">Travel</option>' +
+        '</select>' +
+        '</div>' +
+        '<div class="field">' +
+        '<label for="hobbyFrequency_' + hobbyIndex + '">Practice frequency ' + hobbyIndex + '</label>' +
+        '<input id="hobbyFrequency_' + hobbyIndex + '" name="hobby_frequency_' + hobbyIndex + '" class="hobby-input field-hobby-frequency" type="text" placeholder="e.g. 2 times/week">' +
+        '</div>';
+      hobbyRowsContainer.appendChild(row);
+    }
+
+    function removeHobbySectionFromDom() {
+      const section = ensureHobbySection();
+      if (section && section.parentNode) {
+        section.parentNode.removeChild(section);
+      }
+    }
+
+    function attachHobbySectionToDom() {
+      const form = document.getElementById('workshopForm');
+      const section = ensureHobbySection();
+      const hobbiesRow = hasHobbies.closest('.row');
+      if (section && !document.getElementById('hobbySection') && hobbiesRow) {
+        form.insertBefore(section, hobbiesRow.nextSibling);
+      }
+    }
+
+    function ensureAdvancedSection() {
+      if (!advancedSection) {
+        advancedSection = document.getElementById('advancedSection');
+      }
+      return advancedSection;
+    }
+
+    function removeAdvancedSectionFromDom() {
+      const section = ensureAdvancedSection();
+      if (section && section.parentNode) {
+        section.parentNode.removeChild(section);
+      }
+    }
+
+    function attachAdvancedSectionToDom() {
+      const form = document.getElementById('workshopForm');
+      const section = ensureAdvancedSection();
+      const actions = form.querySelector('.actions');
+      if (section && !document.getElementById('advancedSection') && actions) {
+        form.insertBefore(section, actions);
+      }
+    }
+
+    addHobbyBtn.addEventListener('click', addHobbyRow);
+    basicRadio.addEventListener('change', function () {
+      if (this.checked) {
+        removeAdvancedSectionFromDom();
+      }
+    });
+    advancedRadio.addEventListener('change', function () {
+      if (this.checked) {
+        attachAdvancedSectionToDom();
+      }
+    });
+    dialogTriggerBtn.addEventListener('click', function () {
+      window.confirm('Robot Framework dialog practice: Do you confirm this action?');
+    });
+
+    removeHobbySectionFromDom();
+    removeAdvancedSectionFromDom();
+
+    hasHobbies.addEventListener('change', function () {
+      if (this.checked) {
+        attachHobbySectionToDom();
+      } else {
+        removeHobbySectionFromDom();
+      }
+    });
+
+    submitBtn.addEventListener('click', function () {
+      const firstName = document.getElementById('firstName').value.trim();
+      if (!firstName) {
+        resultMessage.textContent = 'Please add first name before submitting.';
+        return;
+      }
+      resultMessage.textContent = 'Form submitted for ' + firstName + '!';
+    });
+  </script>
+</body>
+</html>
